@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualization</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
     <style>
-        /* Styling for loading spinner and results container */
         #loading {
             display: none;
             font-size: 20px;
@@ -137,23 +135,18 @@
             $('#fetchResponse').on('click', function () {
                 // Show loading spinner while fetching the response
                 $('#loading').show();
-                $('#responseContainer').empty(); // Clear any existing responses
+                $('#responseContainer').empty(); // Clear any existing response
 
-                // Make a POST request to the `/get_response` endpoint
                 $.ajax({
-                    url: '/get_response',  // Ensure this endpoint is created in your Flask app
+                    url: '/get_response',
                     method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ message: "Startup goals analysis request" }),
                     success: function (data) {
-                        $('#responseContainer').html(
-                            `<h2>OpenAI Analysis:</h2>${data.response}` // Display the OpenAI response
-                        ); 
-                        $('#loading').hide(); // Hide loading spinner
+                        $('#responseContainer').html(data.response); // Display OpenAI response
+                        $('#loading').hide(); // Hide loading spinner after receiving data
                     },
                     error: function () {
                         $('#loading').hide(); // Hide loading spinner in case of error
-                        alert('Error fetching the response. Please try again later.');
+                        alert('Error fetching the analysis. Please try again later.');
                     }
                 });
             });
