@@ -7,7 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
-        /* Styling for the loading spinner */
+        /* Styling for loading spinner and results container */
         #loading {
             display: none;
             font-size: 20px;
@@ -16,12 +16,14 @@
             text-align: center;
         }
 
-        /* Add some margin for graphs */
-        #graphsContainer {
+        #responseContainer {
             margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
         }
 
-        /* Styling for the form and dropdowns */
         form {
             margin: 20px;
             padding: 15px;
@@ -33,12 +35,6 @@
         label {
             font-size: 16px;
             margin-right: 10px;
-        }
-
-        select {
-            margin: 10px 0;
-            padding: 8px;
-            width: 250px;
         }
 
         button {
@@ -76,7 +72,7 @@
 
         <label for="startup">Select Startup:</label>
         <select id="startup" name="startup" required>
-            <option value="" disabled selected>Select Startup</option> 
+            <option value="" disabled selected>Select Startup</option>
             {% for startup in startup_names %}
             <option value="{{ startup }}">{{ startup }}</option>
             {% endfor %}
@@ -91,20 +87,28 @@
     <!-- Container for Displaying Graphs -->
     <div id="graphsContainer"></div>
 
+    <!-- New Form for Fetching OpenAI Response -->
+    <form id="responseForm">
+        <button type="button" id="fetchResponse">Get OpenAI Analysis</button>
+    </form>
+
+    <!-- Container for Displaying OpenAI Response -->
+    <div id="responseContainer"></div>
+
     <script>
         $(document).ready(function () {
+            // Form for graphs
             $('#teamForm').on('submit', function (e) {
                 e.preventDefault();
                 const selectedTeam = $('#team').val();
                 const selectedStartup = $('#startup').val();
-              
 
                 // Show loading spinner while the request is being processed
                 $('#loading').show();
-                $('#graphsContainer').empty();  // Clear any existing graphs
+                $('#graphsContainer').empty(); // Clear any existing graphs
 
                 // Check if all selections are made
-                if (!selectedTeam || !selectedStartup ) {
+                if (!selectedTeam || !selectedStartup) {
                     alert('Please select all fields.');
                     $('#loading').hide();
                     return;
@@ -116,15 +120,40 @@
                     method: 'POST',
                     data: {
                         team: selectedTeam,
-                        startup: selectedStartup                  
+                        startup: selectedStartup
                     },
                     success: function (data) {
                         $('#graphsContainer').html(data); // Display the graphs
-                        $('#loading').hide();  // Hide loading spinner after receiving data
+                        $('#loading').hide(); // Hide loading spinner after receiving data
                     },
                     error: function () {
-                        $('#loading').hide();  // Hide loading spinner in case of error
+                        $('#loading').hide(); // Hide loading spinner in case of error
                         alert('Error loading the visualization. Please try again later.');
+                    }
+                });
+            });
+
+            // Button for OpenAI response
+            $('#fetchResponse').on('click', function () {
+                // Show loading spinner while fetching the response
+                $('#loading').show();
+                $('#responseContainer').empty(); // Clear any existing responses
+
+                // Make a POST request to the `/get_response` endpoint
+                $.ajax({
+                    url: '/get_response',  // Ensure this endpoint is created in your Flask app
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ message: "Startup goals analysis request" }),
+                    success: function (data) {
+                        $('#responseContainer').html(
+                            `<h2>OpenAI Analysis:</h2>${data.response}` // Display the OpenAI response
+                        ); 
+                        $('#loading').hide(); // Hide loading spinner
+                    },
+                    error: function () {
+                        $('#loading').hide(); // Hide loading spinner in case of error
+                        alert('Error fetching the response. Please try again later.');
                     }
                 });
             });
