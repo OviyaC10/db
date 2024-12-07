@@ -82,14 +82,6 @@
             {% endfor %}
         </select>
 
-        <label for="company">Select Company:</label>
-        <select id="company" name="company" required>
-            <option value="" disabled selected>Select Company</option>
-            {% for company in companies %}
-            <option value="{{ company }}">{{ company }}</option>
-            {% endfor %}
-        </select>
-
         <button type="submit">Visualize</button>
     </form>
 
@@ -105,14 +97,14 @@
                 e.preventDefault();
                 const selectedTeam = $('#team').val();
                 const selectedStartup = $('#startup').val();
-                const selectedCompany = $('#company').val();  // Get selected company
+              
 
                 // Show loading spinner while the request is being processed
                 $('#loading').show();
                 $('#graphsContainer').empty();  // Clear any existing graphs
 
                 // Check if all selections are made
-                if (!selectedTeam || !selectedStartup || !selectedCompany) {
+                if (!selectedTeam || !selectedStartup ) {
                     alert('Please select all fields.');
                     $('#loading').hide();
                     return;
@@ -124,8 +116,7 @@
                     method: 'POST',
                     data: {
                         team: selectedTeam,
-                        startup: selectedStartup,
-                        company: selectedCompany  // Send company selection to the backend
+                        startup: selectedStartup                  
                     },
                     success: function (data) {
                         $('#graphsContainer').html(data); // Display the graphs
